@@ -70,52 +70,27 @@ func TestResult_AddError(t *testing.T) {
 	}
 }
 
-func TestResult_AddWarning(t *testing.T) {
-	result := Ok()
-	warning := NewWarning("test warning")
-
-	result.AddWarning(warning)
-	if len(result.GetWarnings()) != 1 {
-		t.Errorf("Expected 1 warning, got %d", len(result.GetWarnings()))
-	}
-
-	// Test adding nil warning (should not add)
-	result.AddWarning(nil)
-	if len(result.GetWarnings()) != 1 {
-		t.Errorf("Expected still 1 warning after adding nil, got %d", len(result.GetWarnings()))
-	}
-}
-
 func TestResult_AddRange(t *testing.T) {
 	result := Ok()
 
 	// Add multiple items
 	result.AddRange(
 		NewError("error1"),
-		NewWarning("warning1"),
 		NewError("error2"),
-		NewWarning("warning2"),
 	)
 
 	if len(result.GetErrors()) != 2 {
 		t.Errorf("Expected 2 errors, got %d", len(result.GetErrors()))
 	}
 
-	if len(result.GetWarnings()) != 2 {
-		t.Errorf("Expected 2 warnings, got %d", len(result.GetWarnings()))
-	}
-
 	// Test with nil values (should be ignored)
 	result = Ok()
-	result.AddRange(nil, NewError("error"), nil, NewWarning("warning"))
+	result.AddRange(nil, NewError("error"), nil)
 
 	if len(result.GetErrors()) != 1 {
 		t.Errorf("Expected 1 error, got %d", len(result.GetErrors()))
 	}
 
-	if len(result.GetWarnings()) != 1 {
-		t.Errorf("Expected 1 warning, got %d", len(result.GetWarnings()))
-	}
 }
 
 func TestError_GetMessage(t *testing.T) {
@@ -124,14 +99,5 @@ func TestError_GetMessage(t *testing.T) {
 
 	if err.GetMessage() != message {
 		t.Errorf("Expected message '%s', got '%s'", message, err.GetMessage())
-	}
-}
-
-func TestWarning_GetMessage(t *testing.T) {
-	message := "test warning message"
-	warning := NewWarning(message)
-
-	if warning.GetMessage() != message {
-		t.Errorf("Expected message '%s', got '%s'", message, warning.GetMessage())
 	}
 }

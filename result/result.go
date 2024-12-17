@@ -2,15 +2,13 @@ package result
 
 // Result represents a result that can contain errors and warnings
 type Result struct {
-	errors   []*Error
-	warnings []*Warning
+	errors []*Error
 }
 
 // NewResult creates a new Result instance
 func NewResult() *Result {
 	return &Result{
-		errors:   make([]*Error, 0),
-		warnings: make([]*Warning, 0),
+		errors: make([]*Error, 0),
 	}
 }
 
@@ -27,11 +25,6 @@ func (r *Result) IsFailed() bool {
 // GetErrors returns the slice of errors
 func (r *Result) GetErrors() []*Error {
 	return r.errors
-}
-
-// GetWarnings returns the slice of warnings
-func (r *Result) GetWarnings() []*Warning {
-	return r.warnings
 }
 
 // Ok creates a new successful Result
@@ -67,21 +60,12 @@ func (r *Result) AddError(err *Error) {
 	}
 }
 
-// AddWarning adds a warning to the result
-func (r *Result) AddWarning(warning *Warning) {
-	if warning != nil {
-		r.warnings = append(r.warnings, warning)
-	}
-}
-
 // AddRange adds multiple errors or warnings to the result
 func (r *Result) AddRange(items ...interface{}) {
 	for _, item := range items {
 		switch v := item.(type) {
 		case *Error:
 			r.AddError(v)
-		case *Warning:
-			r.AddWarning(v)
 		}
 	}
 }

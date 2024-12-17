@@ -15,12 +15,24 @@ func main() {
 	failedResult := result.Fail(result.NewError("Something went wrong"))
 	fmt.Printf("Is failed: %v\n", failedResult.IsFailed())
 
-	// Add warnings
-	successResult.AddWarning(result.NewWarning("This is a warning"))
+	failedList := []result.Error{
+		*result.NewError("Something went wrong"),
+		*result.NewError("Something went wrong 2"),
+	}
+	fmt.Printf("Failed list: %v\n", failedList)
+
+	successResultT := result.OkT[any](struct {
+		Id   int
+		Name string
+	}{
+		Id:   1,
+		Name: "John",
+	})
+	fmt.Printf("Is successful T: %v\n", successResultT.IsSuccessful())
+	fmt.Printf("Value T: %v\n", successResultT.GetValue())
 
 	// Add multiple items
 	successResult.AddRange(
 		result.NewError("An error"),
-		result.NewWarning("Another warning"),
 	)
 }
