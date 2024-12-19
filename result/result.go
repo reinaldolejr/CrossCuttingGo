@@ -1,6 +1,6 @@
 package result
 
-// Result represents a result that can contain errors and warnings
+// Result represents a result that can contain errors
 type Result struct {
 	errors []*Error
 }
@@ -60,7 +60,7 @@ func (r *Result) AddError(err *Error) {
 	}
 }
 
-// AddRange adds multiple errors or warnings to the result
+// AddRange adds multiple errors to the result
 func (r *Result) AddRange(items ...interface{}) {
 	for _, item := range items {
 		switch v := item.(type) {

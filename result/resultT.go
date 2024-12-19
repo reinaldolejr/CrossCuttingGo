@@ -1,6 +1,6 @@
 package result
 
-// ResultT represents a result that can contain errors and warnings
+// ResultT represents a result that can contain errors
 type ResultT[T any] struct {
 	Result
 	value T

@@ -1,29 +1,28 @@
 # CrossCuttingGo
 
-CrossCuttingGo is a lightweight Go library that provides a Result type for better error and warning handling in Go applications. It helps you manage operation outcomes with success/failure states, errors, and warnings in a more structured way.
+CrossCuttingGo is a lightweight Go library that provides a Result type for better error and warning handling in Go applications. It helps you manage operation outcomes with success/failure states, and errors in a more structured way.
 
 ## Features
 
-- Simple Result type with success/failure states
-- Support for multiple errors and warnings
-- Fluent interface for adding errors and warnings
-- Easy to integrate into existing Go projects
+- 🎯 Simple Result type with success/failure states
+- ⚠️ Support for multiple errors
+- 🔄 Fluent interface for chaining operations
+- 🔌 Easy integration with existing Go projects
+- 🧪 Type-safe generic Result[T] for handling typed returns
 
 ## Installation
-
-To install CrossCuttingGo, use `go get`:
 
 ```bash
 go get github.com/reinaldolejr/CrossCuttingGo
 ```
 
-## Usage
+## Quick Start
 
-Here's a simple example of how to use CrossCuttingGo:
+### Basic Usage
 
 ```go
-
 package main
+
 import (
     "fmt"
     "github.com/reinaldolejr/CrossCuttingGo/result"
@@ -32,45 +31,110 @@ import (
 func main() {
     // Create a successful result
     successResult := result.Ok()
-    fmt.Printf("Is successful: %v\n", successResult.IsSuccessful())
+    fmt.Printf("Success: %v\n", successResult.IsSuccessful())
+
     // Create a failed result
-    failedResult := result.Fail(result.NewError("Something went wrong"))
-    fmt.Printf("Is failed: %v\n", failedResult.IsFailed())
-    // Add warnings to a result
-    successResult.AddWarning(result.NewWarning("This is a warning"))
-    // Add multiple items (errors and warnings)
-    successResult.AddRange(
-        result.NewError("An error"),
-        result.NewWarning("Another warning"),
+    failedResult := result.Fail(result.NewError("Operation failed"))
+    fmt.Printf("Failed: %v\n", failedResult.IsFailed())
+
+    // Chain multiple operations
+    r.AddRange(
+        result.NewError("Something went wrong"),
+        result.NewError("Connection timeout"),
     )
 }
-
 ```
 
+### Using Generic Results
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/reinaldolejr/CrossCuttingGo/result"
+)
+
+func divide(a, b float64) result.Result[float64] {
+    if b == 0 {
+        return result.FailT[float64](result.NewError("Division by zero"))
+    }
+    return result.OkT(a / b)
+}
+
+func main() {
+    r := divide(10, 2)
+    if r.IsSuccessful() {
+        value := r.Value() // 5
+        fmt.Printf("Result: %v\n", value)
+    }
+
+    r2 := divide(10, 0)
+    if r2.IsFailed() {
+        fmt.Printf("Error: %v\n", r2.Errors()[0].Message())
+    }
+}
+```
 
 ## API Reference
 
+### Result Types
+
+- `Result` - Basic result type for success/failure scenarios
+- `Result[T]` - Generic result type that includes a value of type T
+
 ### Creating Results
 
-- `result.Ok()` - Creates a new successful result
-- `result.Fail(error)` - Creates a new failed result with an error
+```go
+// Basic Results
+result.Ok()                    // Successful result
+result.Fail(error)            // Failed result with error
+
+// Generic Results
+result.OkT(value T)           // Successful result with value
+result.FailT[T](error)        // Failed result with error
+```
 
 ### Methods
 
-- `IsSuccessful()` - Returns true if the result is successful
-- `IsFailed()` - Returns true if the result has failed
-- `AddWarning(warning)` - Adds a warning to the result
-- `AddError(error)` - Adds an error to the result
-- `AddRange(items...)` - Adds multiple errors and/or warnings to the result
+#### Common Methods
+- `IsSuccessful() bool` - Checks if the result is successful
+- `IsFailed() bool` - Checks if the result has failed
+- `AddError(error)` - Adds an error
+- `AddRange(items...)` - Adds multiple errors
+- `Errors() []Error` - Gets all errors
+
+#### Generic Result Methods
+- `Value() T` - Gets the value (for Result[T])
+- `ValueOrDefault() T` - Gets the value or zero value if failed
+
+## Error Handling Best Practices
+
+```go
+func ProcessOrder(orderID string) result.Result[Order] {
+    order, err := db.GetOrder(orderID)
+    if err != nil {
+        return result.FailT[Order](result.NewError("Failed to fetch order"))
+    }
+
+    if order.IsExpired() {
+        r := result.OkT(order)
+        r.AddWarning(result.NewWarning("Order is expired"))
+        return r
+    }
+
+    return result.OkT(order)
+}
+```
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
 
-This project is licensed under the [LICENSE](LICENSE) file in the root directory of this repository.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Author
 
-Reinaldo Junior (@reinaldolejr)
+Reinaldo Junior ([@reinaldolejr](https://github.com/reinaldolejr))
